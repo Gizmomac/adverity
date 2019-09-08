@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics</title>
+    {% load static %}
+    <script src="{% static "analytics/highcharts.js" %}"></script>
+</head>
+<body>
+<div id="container"></div>
+<div id="filters">
+    <form action="{% url 'data-list' %}" method="get">
+        <select name="sources" class="custom-select" multiple title="Sources">
+            {% for source in sources %}
+                <option value="{{ source.id }}"
+                        {% if source.id|slugify in selected_sources %}selected{% endif %}>{{ source.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <select name="campaigns" class="custom-select" multiple title="Campaigns">
+            {% for campaign in campaigns %}
+                <option value="{{ campaign.id }}"
+                        {% if campaign.id|slugify in selected_campaigns %}selected{% endif %}>{{ campaign.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Filter">
+    </form>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let _clicks = [{% for element in object_list %}[
+            Date.UTC({{ element.date|date:"Y, m, d" }}),{{ element.sum_clicks }}],{% endfor %}];
+        let _impressions = [
+            {% for element in object_list %}
+                {% if element.sum_impressions %}
+                    [Date.UTC({{ element.date|date:"Y, m, d" }}),
+                        {{ element.sum_impressions }}],
+                {% endif %}
+            {% endfor %}
+        ];
+        Highcharts.chart('container', {
+            chart: {
+                zoomType: 'xy',
+            },
+            title: {
+                text: 'Analytics'
+            },
+            xAxis: [{
+                ordinal: true,
+                type: 'datetime',
+                crosshair: true
+            }],
+            yAxis: [
+                {
+                    ordinal: true,
+                    min: 0,
+                    title: {
+                        text: 'Clicks'
+                    }
+                }, {
+                    ordinal: true,
+                    min: 0,
+                    title: {
+                        text: 'Impressions'
+                    },
+                    opposite: true
+
+                }
+            ],
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            },
+            plotOptions: {
+                series: {
+                    label: {
+                        connectorAllowed: false
+                    },
+                }
+            },
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            },
+            series: [
+                {
+                    name: 'Clicks',
+                    yAxis: 0,
+                    data: _clicks
+                },
+                {
+                    name: 'Impressions',
+                    yAxis: 1,
+                    data: _impressions
+                },
+            ]
+        });
+    });
+</script>
+</body>
+</html>
