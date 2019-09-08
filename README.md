@@ -17,13 +17,22 @@ I generated the data directly into the view.
 To show the charts, I'm using Highcharts, because I never used it before and it looks fancy :)
 
 ## Locally
-Setup the environment:
+
+### Prerequisites
+Python 3.7, sqlite and Virtualenv
+
+### Setup and run
+Setup the environment
 ```
-pip install -r requirements
+git clone https://github.com/Gizmomac/adverity.git
+cd adverity
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
 python manage.py migrate
 python manage.py collectstatic
 ```
-To load the data:
+Load the data
 ```
 python manage.py import_data
 ```
@@ -48,11 +57,13 @@ make importdata
 ## TODOs and suggested improvement:
 
 * The ETL strategy is far from production ready, need error handling insert chunks etc...
-* If we want to trigger the file load from the UI, we need celery to do the load in the background.
-* When I have limited amount of time I use UnitTest, but PyTest would be more modern.
+* If we want to trigger the file load from the UI, we need celery to do the load in the background
+* When I have limited amount of time I use UnitTest, but PyTest would be more modern
 * Test the templates
 * Maybe use Django Forms at the select
-* With a different UI, we could first select Source and prefilter campagins to show only the ones 
+* With a different UI, we could first select Source and pre-filter campaigns to show only the ones 
 what has available data for the selected source(s).
 * Add Sentry
 * Add logging specially
+* Serve static files with NGINX with Docker
+* Maybe make sense to separate click and Impressions data (depend on the usage)
